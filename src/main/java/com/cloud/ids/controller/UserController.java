@@ -1,7 +1,10 @@
 package com.cloud.ids.controller;
 
-import com.cloud.ids.entity.User;
+import com.cloud.ids.dto.UserRequest;
+import com.cloud.ids.dto.UserResponse;
 import com.cloud.ids.service.UserService;
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,13 +22,13 @@ public class UserController {
         this.service = service;
     }
 
-    @PostMapping
-    public User createUser(@RequestBody User user) {
-        return service.createUser(user);
-    }
+   @PostMapping
+public UserResponse createUser(@Valid @RequestBody UserRequest request) {
+    return service.createUser(request);
+}
 
     @GetMapping
-    public List<User> getAllUsers() {
+    public List<UserResponse> getAllUsers() {
         return service.getAllUsers();
     }
 }
