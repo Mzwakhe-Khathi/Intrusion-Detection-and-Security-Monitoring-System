@@ -67,6 +67,12 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- H2 Console -->	
+	<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-h2console</artifactId>
+</dependency>
+
 		<!-- Real DB driver for when you deploy to the cloud -->
 		<dependency>
 			<groupId>org.postgresql</groupId>

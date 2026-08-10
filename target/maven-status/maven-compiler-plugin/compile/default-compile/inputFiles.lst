@@ -1,4 +1,17 @@
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/ exception/GlobalExceptionHandler.java
 /home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/IdsApplication.java
-/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/client/client.java
-/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/protocol/prtocolHandler.java
-/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/sever/sever.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/config/PasswordConfig.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/config/SecurityConfig.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/controller/AuthController.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/controller/IdsController.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/controller/UserController.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/dto/ApiResponse.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/dto/LoginRequest.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/dto/LoginResponse.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/dto/UserRequest.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/dto/UserResponse.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/entity/User.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/repository/UserRepository.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/security/JwtService.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/service/AuthService.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/service/UserService.java
