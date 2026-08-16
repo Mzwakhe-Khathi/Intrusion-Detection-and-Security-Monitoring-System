@@ -6,3 +6,9 @@ curl -X POST http://localhost:8080/api/users \
   "email":"john@example.com",
   "password":"password123"
 }'
+
+
+curl -i http://localhost:8080/api/users
+
+curl -i http://localhost:8080/api/users \
+-H "Authorization: Bearer YOUR_TOKEN"
