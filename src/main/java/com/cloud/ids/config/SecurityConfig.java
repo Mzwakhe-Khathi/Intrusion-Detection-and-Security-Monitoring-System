@@ -20,20 +20,24 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 // Control which endpoints require authentication
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/",
-                                "/api/auth/login",
-                                "/h2-console/**"
-                        ).permitAll()
+               .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers(
-                        HttpMethod.POST,
-                         "/api/users"
-                        ).permitAll()
+                 .requestMatchers(
+                "/",
+                "/api/auth/login",
+                "/h2-console/**"
+                ).permitAll()
 
-                        .anyRequest().authenticated()
-                )
+                .requestMatchers(
+                HttpMethod.POST,
+                "/api/users"
+                ).permitAll()
+
+                .requestMatchers("/api/admin/**")
+                .hasRole("ADMIN")
+
+        .       anyRequest().authenticated()
+        )
 
                 
 

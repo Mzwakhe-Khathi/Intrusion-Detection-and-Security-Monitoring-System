@@ -12,3 +12,10 @@ curl -i http://localhost:8080/api/users
 
 curl -i http://localhost:8080/api/users \
 -H "Authorization: Bearer YOUR_TOKEN"
+
+curl -X POST http://localhost:8080/api/auth/login \
+-H "Content-Type: application/json" \
+-d '{
+    "email": "john@example.com",
+    "password": "password123"
+}'
