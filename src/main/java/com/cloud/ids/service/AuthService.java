@@ -4,7 +4,6 @@ import com.cloud.ids.dto.LoginRequest;
 import com.cloud.ids.dto.LoginResponse;
 import com.cloud.ids.entity.SecurityEvent;
 import com.cloud.ids.entity.User;
-import com.cloud.ids.repository.SecurityEventRepository;
 import com.cloud.ids.repository.UserRepository;
 import com.cloud.ids.security.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,18 +18,18 @@ public class AuthService {
     private final UserRepository repository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final SecurityEventRepository securityEventRepository;
+    private final SecurityEventService securityEventService;
 
     public AuthService(
             UserRepository repository,
             BCryptPasswordEncoder passwordEncoder,
             JwtService jwtService,
-            SecurityEventRepository securityEventRepository) {
+            SecurityEventService securityEventService) {
 
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
-        this.securityEventRepository = securityEventRepository;
+        this.securityEventService = securityEventService;
     }
 
     public LoginResponse login(
@@ -53,7 +52,7 @@ public class AuthService {
                             "NEW"
                     );
 
-                    securityEventRepository.save(event);
+                    securityEventService.createEvent(event);
 
                     return new RuntimeException("Invalid email or password");
                 });
@@ -72,7 +71,7 @@ public class AuthService {
                     "NEW"
             );
 
-            securityEventRepository.save(event);
+            securityEventService.createEvent(event);
 
             throw new RuntimeException("Invalid email or password");
         }
@@ -87,7 +86,7 @@ public class AuthService {
                 "NEW"
         );
 
-        securityEventRepository.save(event);
+        securityEventService.createEvent(event);
 
         String token = jwtService.generateToken(user.getEmail(), user.getRole());
 

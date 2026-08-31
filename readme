@@ -24,3 +24,142 @@ curl -X POST http://localhost:8080/api/auth/login \
 http://localhost:8080/h2-console
 
 SELECT * FROM SECURITY_EVENTS;
+
+SELECT ID, EMAIL, PASSWORD, ROLE FROM USERS;
+
+---
+
+# PHASE 7: BRUTE-FORCE DETECTION
+
+## Setup: Create a BRUTE_FORCE Detection Rule
+
+Before testing, insert a detection rule into the database. In H2 Console, run:
+
+```sql
+INSERT INTO DETECTION_RULES (name, description, rule_type, enabled, threshold, time_window_minutes, created_at)
+VALUES (
+  'Brute Force Detector',
+  'Detects multiple failed login attempts from the same IP within 5 minutes',
+  'BRUTE_FORCE',
+  true,
+  5,
+  5,
+  CURRENT_TIMESTAMP
+);
+```
+
+**What this means:**
+- Rule type: `BRUTE_FORCE`
+- Threshold: `5` (Alert triggers after 5 failed attempts)
+- Time window: `5` minutes
+- Status: `enabled = true`
+
+---
+
+## Test: Trigger Brute-Force Detection
+
+### 1. Make 5 Failed Login Attempts from the Same IP
+
+Run this command 5 times (or copy-paste multiple times):
+
+```bash
+curl -X POST http://localhost:8080/api/auth/login \
+-H "Content-Type: application/json" \
+-d '{
+    "email": "john@example.com",
+    "password": "WRONG_PASSWORD"
+}'
+```
+
+Each attempt will:
+- Log a `LOGIN_FAILURE` event with the client IP
+- Get saved to `SECURITY_EVENTS` table
+- Trigger the detection engine
+
+### 2. After the 5th Attempt
+
+The detection engine will:
+- Count failed logins from your IP in the last 5 minutes
+- Find 5 failures >= threshold of 5
+- Check if an open alert already exists
+- Generate a `BRUTE_FORCE` alert
+
+---
+
+## Verify Detection Results
+
+### Check Security Events
+
+```sql
+SELECT * FROM SECURITY_EVENTS
+WHERE event_type = 'LOGIN_FAILURE'
+ORDER BY timestamp DESC;
+```
+
+You should see 5 failed login attempts from your IP (127.0.0.1).
+
+### Check Security Alerts
+
+```sql
+SELECT * FROM SECURITY_ALERTS
+WHERE alert_type = 'BRUTE_FORCE'
+ORDER BY timestamp DESC;
+```
+
+You should see:
+- 1 alert of type `BRUTE_FORCE`
+- Status: `OPEN`
+- Severity: `HIGH`
+- Description: Shows failure count and time window
+
+### Example Alert:
+```
+alertType   = BRUTE_FORCE
+severity    = HIGH
+sourceIp    = 127.0.0.1
+status      = OPEN
+description = Brute-force attack detected: 5 failed login attempts from IP 127.0.0.1 within 5 minutes
+```
+
+---
+
+## Duplicate Alert Prevention
+
+If you make a 6th failed login attempt:
+
+```bash
+curl -X POST http://localhost:8080/api/auth/login \
+-H "Content-Type: application/json" \
+-d '{
+    "email": "john@example.com",
+    "password": "WRONG_PASSWORD"
+}'
+```
+
+The detection engine will:
+- Count 6 failures >= threshold of 5 ✓
+- Look for an existing OPEN alert from 127.0.0.1 ✓
+- **NOT create a duplicate alert** because one already exists
+
+Check the database:
+```sql
+SELECT COUNT(*) as alert_count FROM SECURITY_ALERTS
+WHERE alert_type = 'BRUTE_FORCE' AND source_ip = '127.0.0.1' AND status = 'OPEN';
+```
+
+You should still see **only 1 alert**, not 2.
+
+---
+
+## Resolve an Alert
+
+When you've investigated and want to mark the alert as handled:
+
+```bash
+curl -X PUT http://localhost:8080/api/alerts/{id}/resolve \
+-H "Authorization: Bearer YOUR_TOKEN"
+```
+
+The alert status will change to `RESOLVED`.
+
+Once resolved, if another brute-force attempt occurs, a **new alert will be generated** (because the old one is no longer OPEN).
