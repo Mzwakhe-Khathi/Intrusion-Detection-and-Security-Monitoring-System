@@ -128,6 +128,7 @@ public class DetectionService {
         alert.setSource("DetectionEngine");
         alert.setTimestamp(event.getTimestamp());
         alert.setDescription(rule.getDescription() + ": " + event.getDescription());
+        alert.setStatus("OPEN");
         return alertRepository.save(alert);
     }
 }

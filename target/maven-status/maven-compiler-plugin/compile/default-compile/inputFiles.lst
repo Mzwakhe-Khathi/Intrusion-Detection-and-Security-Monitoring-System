@@ -12,6 +12,7 @@
 /home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/dto/ApiResponse.java
 /home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/dto/LoginRequest.java
 /home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/dto/LoginResponse.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/dto/SecurityStatsResponse.java
 /home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/dto/UserRequest.java
 /home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/dto/UserResponse.java
 /home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/entity/DetectionRule.java
@@ -29,4 +30,5 @@
 /home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/service/DetectionService.java
 /home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/service/SecurityAlertService.java
 /home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/service/SecurityEventService.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/service/SecurityStatsService.java
 /home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/service/UserService.java
