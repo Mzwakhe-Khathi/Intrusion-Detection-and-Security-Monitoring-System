@@ -1,3 +1,5 @@
+psql -h localhost -U ids_user -d ids
+
 curl -X POST http://localhost:8080/api/users \
 -H "Content-Type: application/json" \
 -d '{
@@ -19,6 +21,9 @@ curl -X POST http://localhost:8080/api/auth/login \
     "email": "john@example.com",
     "password": "password123"
 }'
+
+curl -v http://localhost:8080/api/users \
+-H "Authorization: Bearer YOUR_TOKEN"
 
 
 http://localhost:8080/h2-console
@@ -165,3 +170,55 @@ curl -X PUT http://localhost:8080/api/alerts/{id}/resolve \
 The alert status will change to `RESOLVED`.
 
 Once resolved, if another brute-force attempt occurs, a **new alert will be generated** (because the old one is no longer OPEN).
+
+
+
+## SQL COMMANDS
+
+THIS IS HOW YOU open sql 
+
+psql -h localhost -U ids_user -d ids
+sudo docker exec -it ids-postgres psql -U ids_app -d idsdb
+
+These are the tables we have  
+
+**detection_rules**
+ **security_alerts**
+ **security_events**
+ **users**
+
+## how to Check the users table
+SELECT id, first_name, last_name, email, role FROM users;
+
+SELECT * FROM security_events;
+SELECT * FROM detection_rules;
+SELECT * FROM security_alerts;q
+
+
+
+spring.datasource.password=${DB_PASSWORD:ids_password}
+
+
+sudo docker run --name ids-app \
+  --network ids-network \
+  -p 8080:8080 \
+  -e DB_URL="jdbc:postgresql://ids-postgres:5432/ids" \
+  -e DB_USERNAME="ids_user" \
+  -e DB_PASSWORD="ids_password" \
+  -e JWT_SECRET="ah0yw/DmsqCTQk+EtjlBiix9uMQBg/7IGwGmFjJG9XQ=" \
+  ids:latest
+
+
+
+  vUBeO3iwvYLyf+XWD6f2zQfsnmTQO6BWhoX6GRXwY=
+sU
+  sudo docker run --name ids-app \
+  --network ids-network \
+  -p 8080:8080 \
+  -e DB_URL="jdbc:postgresql://ids-postgres:5432/ids" \
+  -e DB_USERNAME="ids_user" \
+  -e DB_PASSWORD="ids_password" \
+  -e JWT_SECRET="lip+Cj4c6tHP7GuCwBo+v0UJL4PG9SDdHztKltUuVLQ="= \
+  ids:latest
+
+  aW5ZukreXWO9NPPjDZJZFNdjuCXTEysHGtuiHwK/IIo=

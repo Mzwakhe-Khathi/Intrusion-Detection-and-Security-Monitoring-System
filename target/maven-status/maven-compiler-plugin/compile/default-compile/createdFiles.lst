@@ -1,5 +1,5 @@
-com/cloud/ids/controller/SecurityAlertController.class
 com/cloud/ids/dto/UserResponse.class
+com/cloud/ids/controller/SecurityAlertController.class
 com/cloud/ids/service/UserService.class
 com/cloud/ids/repository/SecurityEventRepository.class
 com/cloud/ids/dto/LoginResponse.class
@@ -12,13 +12,13 @@ com/cloud/ids/dto/LoginRequest.class
 com/cloud/ids/config/PasswordConfig.class
 com/cloud/ids/service/DetectionService.class
 com/cloud/ids/security/JwtAuthenticationFilter.class
-com/cloud/ids/repository/SecurityAlertRepository.class
 com/cloud/ids/repository/UserRepository.class
+com/cloud/ids/repository/SecurityAlertRepository.class
 com/cloud/ids/service/SecurityStatsService.class
 com/cloud/ids/service/SecurityAlertService.class
 com/cloud/ids/service/SecurityEventService.class
-com/cloud/ids/repository/DetectionRuleRepository.class
 com/cloud/ids/dto/ApiResponse.class
+com/cloud/ids/repository/DetectionRuleRepository.class
 com/cloud/ids/dto/UserRequest.class
 com/cloud/ids/security/JwtService.class
 com/cloud/ids/entity/SecurityAlert.class

@@ -8,5 +8,10 @@
     "name": "spring.h2.console.path",
     "type": "java.lang.String",
     "description": "A description for 'spring.h2.console.path'"
+  },
+  {
+    "name": "export",
+    "type": "java.lang.String",
+    "description": "A description for 'export'"
   }
 ]}
