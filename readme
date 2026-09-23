@@ -1,49 +1,284 @@
-psql -h localhost -U ids_user -d ids
+# Intrusion Detection & Security Monitoring System
 
-curl -X POST http://localhost:8080/api/users \
--H "Content-Type: application/json" \
--d '{
-  "firstName":"John",
-  "lastName":"Doe",
-  "email":"john@example.com",
-  "password":"password123"
-}'
+## Overview
 
+This project is a Spring Boot application for monitoring and responding to suspicious access patterns. It includes user registration, JWT-based authentication, security event logging, detection rules, and brute-force alerting.
 
-curl -i http://localhost:8080/api/users
+The system is designed to:
 
-curl -i http://localhost:8080/api/users \
--H "Authorization: Bearer YOUR_TOKEN"
-
-curl -X POST http://localhost:8080/api/auth/login \
--H "Content-Type: application/json" \
--d '{
-    "email": "john@example.com",
-    "password": "password123"
-}'
-
-curl -v http://localhost:8080/api/users \
--H "Authorization: Bearer YOUR_TOKEN"
-
-
-http://localhost:8080/h2-console
-
-SELECT * FROM SECURITY_EVENTS;
-
-SELECT ID, EMAIL, PASSWORD, ROLE FROM USERS;
-
-SELECT * FROM SECURITY_ALERTS WHERE alert_type = 'BRUTE_FORCE';
+- register and manage users
+- authenticate users with JWT
+- record failed and successful login events
+- evaluate detection rules such as brute-force attempts
+- create and resolve security alerts
+- persist data in PostgreSQL
 
 ---
 
-# PHASE 7: BRUTE-FORCE DETECTION
+## Features
 
-## Setup: Create a BRUTE_FORCE Detection Rule
+- User registration and retrieval
+- Login endpoint with JWT token generation
+- Security event tracking
+- Brute-force detection using threshold-based rules
+- Alert creation and resolution flow
+- Dockerized PostgreSQL deployment
 
-Before testing, insert a detection rule into the database. In H2 Console, run:
+---
+
+## Project Structure
+
+```text
+.
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   └── resources/
+│   └── test/
+├── Dockerfile
+├── docker-compose.yml
+├── pom.xml
+├── mvnw
+├── readme
+└── HELP.md
+```
+
+Main application files:
+
+- [docker-compose.yml](docker-compose.yml) — PostgreSQL + app container setup
+- [src/main/resources/application.properties](src/main/resources/application.properties) — datasource and config
+- [src/main/java/com/cloud/ids/config/SecurityConfig.java](src/main/java/com/cloud/ids/config/SecurityConfig.java) — endpoint security rules
+- [src/main/java/com/cloud/ids/service/DetectionRuleService.java](src/main/java/com/cloud/ids/service/DetectionRuleService.java) — default brute-force rule setup
+
+---
+
+## Setup
+
+### Prerequisites
+
+- Java 21
+- Maven or the bundled Maven wrapper
+- Docker
+- Docker Compose
+- Optional: PostgreSQL client (`psql`)
+
+### Check tool versions
+
+```bash
+java -version
+./mvnw -version
+docker --version
+docker compose version
+```
+
+### Environment variables
+
+Generate a JWT secret:
+
+```bash
+openssl rand -base64 32
+```
+
+Then export it:
+
+```bash
+export JWT_SECRET="your_generated_secret_here"
+```
+
+If desired, add it to a local `.env` file:
+
+```env
+JWT_SECRET=your_generated_secret_here
+```
+
+### Run with Docker Compose
+
+From the project root:
+
+```bash
+docker compose up --build -d
+```
+
+Check services:
+
+```bash
+docker compose ps
+```
+
+View logs:
+
+```bash
+docker compose logs -f ids-app
+```
+
+The app should be available at:
+
+```text
+http://localhost:8080
+```
+
+### Run locally with Maven
+
+```bash
+export DB_URL="jdbc:postgresql://localhost:5432/idsdb"
+export DB_USERNAME="ids_app"
+export DB_PASSWORD="ids_password"
+export JWT_SECRET="your_generated_secret_here"
+
+./mvnw clean package
+java -jar target/ids-0.0.1-SNAPSHOT.jar
+```
+
+---
+
+## API Endpoints
+
+### User endpoints
+
+#### Create a user
+
+```bash
+curl -X POST http://localhost:8080/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName":"John",
+    "lastName":"Doe",
+    "email":"john@example.com",
+    "password":"password123"
+  }'
+```
+
+#### List users
+
+```bash
+curl -i http://localhost:8080/api/users
+```
+
+#### Authenticated user request
+
+```bash
+curl -i http://localhost:8080/api/users \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+### Authentication endpoints
+
+#### Login
+
+```bash
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "password": "password123"
+  }'
+```
+
+Example response:
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "type": "Bearer"
+}
+```
+
+### Alert endpoints
+
+#### Resolve a security alert
+
+```bash
+curl -X PUT http://localhost:8080/api/alerts/{id}/resolve \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+Example:
+
+```bash
+curl -X PUT http://localhost:8080/api/alerts/1/resolve \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+---
+
+## PostgreSQL Access
+
+### Connect to the container
+
+```bash
+sudo docker exec -it ids-postgres psql -U ids_app -d idsdb
+```
+
+### Connect from the host
+
+```bash
+psql -h localhost -U ids_app -d idsdb
+```
+
+Password:
+
+```text
+ids_password
+```
+
+### Useful database queries
+
+Users:
 
 ```sql
-INSERT INTO DETECTION_RULES (name, description, rule_type, enabled, threshold, time_window_minutes, created_at)
+SELECT id, first_name, last_name, email, role FROM users;
+```
+
+Security events:
+
+```sql
+SELECT * FROM security_events ORDER BY timestamp DESC;
+```
+
+Detection rules:
+
+```sql
+SELECT * FROM detection_rules ORDER BY created_at DESC;
+```
+
+Security alerts:
+
+```sql
+SELECT * FROM security_alerts ORDER BY timestamp DESC;
+```
+
+Brute-force alerts only:
+
+```sql
+SELECT * FROM security_alerts
+WHERE alert_type = 'BRUTE_FORCE'
+ORDER BY timestamp DESC;
+```
+
+Check the default rule:
+
+```sql
+SELECT id, name, rule_type, enabled, threshold, time_window_minutes
+FROM detection_rules
+WHERE rule_type = 'BRUTE_FORCE';
+```
+
+---
+
+## Brute-Force Detection
+
+The application creates a default brute-force rule automatically if none exists.
+
+### Confirm the rule exists
+
+```sql
+SELECT * FROM detection_rules WHERE rule_type = 'BRUTE_FORCE';
+```
+
+If it is missing, create it manually:
+
+```sql
+INSERT INTO detection_rules (name, description, rule_type, enabled, threshold, time_window_minutes, created_at)
 VALUES (
   'Brute Force Detector',
   'Detects multiple failed login attempts from the same IP within 5 minutes',
@@ -55,170 +290,136 @@ VALUES (
 );
 ```
 
-**What this means:**
-- Rule type: `BRUTE_FORCE`
-- Threshold: `5` (Alert triggers after 5 failed attempts)
-- Time window: `5` minutes
-- Status: `enabled = true`
+### Trigger detection
 
----
-
-## Test: Trigger Brute-Force Detection
-
-### 1. Make 5 Failed Login Attempts from the Same IP
-
-Run this command 5 times (or copy-paste multiple times):
+Run this request five times from the same source IP:
 
 ```bash
 curl -X POST http://localhost:8080/api/auth/login \
--H "Content-Type: application/json" \
--d '{
+  -H "Content-Type: application/json" \
+  -d '{
     "email": "john@example.com",
     "password": "WRONG_PASSWORD"
-}'
+  }'
 ```
 
-Each attempt will:
-- Log a `LOGIN_FAILURE` event with the client IP
-- Get saved to `SECURITY_EVENTS` table
-- Trigger the detection engine
+After the fifth failed login, the system should create a `BRUTE_FORCE` alert.
 
-### 2. After the 5th Attempt
+### Verify results
 
-The detection engine will:
-- Count failed logins from your IP in the last 5 minutes
-- Find 5 failures >= threshold of 5
-- Check if an open alert already exists
-- Generate a `BRUTE_FORCE` alert
-
----
-
-## Verify Detection Results
-
-### Check Security Events
+Check security events:
 
 ```sql
-SELECT * FROM SECURITY_EVENTS
+SELECT * FROM security_events
 WHERE event_type = 'LOGIN_FAILURE'
 ORDER BY timestamp DESC;
 ```
 
-You should see 5 failed login attempts from your IP (127.0.0.1).
-
-### Check Security Alerts
+Check alerts:
 
 ```sql
-SELECT * FROM SECURITY_ALERTS
+SELECT * FROM security_alerts
 WHERE alert_type = 'BRUTE_FORCE'
 ORDER BY timestamp DESC;
 ```
 
-You should see:
-- 1 alert of type `BRUTE_FORCE`
-- Status: `OPEN`
-- Severity: `HIGH`
-- Description: Shows failure count and time window
+Expected result:
 
-### Example Alert:
-```
-alertType   = BRUTE_FORCE
-severity    = HIGH
-sourceIp    = 127.0.0.1
-status      = OPEN
-description = Brute-force attack detected: 5 failed login attempts from IP 127.0.0.1 within 5 minutes
-```
+- one open `BRUTE_FORCE` alert
+- severity is typically `HIGH`
+- status is `OPEN`
+- description mentions failure count and time window
 
----
+### Duplicate alert prevention
 
-## Duplicate Alert Prevention
-
-If you make a 6th failed login attempt:
-
-```bash
-curl -X POST http://localhost:8080/api/auth/login \
--H "Content-Type: application/json" \
--d '{
-    "email": "john@example.com",
-    "password": "WRONG_PASSWORD"
-}'
-```
-
-The detection engine will:
-- Count 6 failures >= threshold of 5 ✓
-- Look for an existing OPEN alert from 127.0.0.1 ✓
-- **NOT create a duplicate alert** because one already exists
-
-Check the database:
 ```sql
-SELECT COUNT(*) as alert_count FROM SECURITY_ALERTS
-WHERE alert_type = 'BRUTE_FORCE' AND source_ip = '127.0.0.1' AND status = 'OPEN';
+SELECT COUNT(*) AS alert_count
+FROM security_alerts
+WHERE alert_type = 'BRUTE_FORCE'
+  AND source_ip = '127.0.0.1'
+  AND status = 'OPEN';
 ```
 
-You should still see **only 1 alert**, not 2.
+The app should keep only one open alert per active source IP.
 
 ---
 
-## Resolve an Alert
+## Troubleshooting
 
-When you've investigated and want to mark the alert as handled:
+### Application does not start
+
+Check the logs:
 
 ```bash
-curl -X PUT http://localhost:8080/api/alerts/{id}/resolve \
--H "Authorization: Bearer YOUR_TOKEN"
+docker compose logs -f ids-app
 ```
 
-The alert status will change to `RESOLVED`.
+Common causes:
 
-Once resolved, if another brute-force attempt occurs, a **new alert will be generated** (because the old one is no longer OPEN).
+- missing `JWT_SECRET`
+- Postgres not ready yet
+- bad database credentials
+- port 8080 already in use
 
+### Database connection errors
 
+Verify the Postgres container is healthy:
 
-## SQL COMMANDS
+```bash
+docker compose ps
+```
 
-THIS IS HOW YOU open sql 
+Then test the DB connection:
 
-psql -h localhost -U ids_user -d ids
-sudo docker exec -it ids-postgres psql -U ids_app -d idsdb
+```bash
+sudo docker exec -it ids-postgres psql -U ids_app -d idsdb -c "SELECT 1;"
+```
 
-These are the tables we have  
+### Missing brute-force rule
 
-**detection_rules**
- **security_alerts**
- **security_events**
- **users**
+```sql
+SELECT * FROM detection_rules WHERE rule_type = 'BRUTE_FORCE';
+```
 
-## how to Check the users table
-SELECT id, first_name, last_name, email, role FROM users;
+If it is empty, insert the rule as shown above.
 
-SELECT * FROM security_events;
-SELECT * FROM detection_rules;
-SELECT * FROM security_alerts;q
+### JWT auth failures
 
+Make sure your token is valid and included in the request header:
 
+```bash
+curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8080/api/users
+```
 
-spring.datasource.password=${DB_PASSWORD:ids_password}
+### Duplicate alerts appear
 
+Check whether the same IP is still in an open alert state. Only one active alert should exist for that IP until it is resolved.
 
-sudo docker run --name ids-app \
-  --network ids-network \
-  -p 8080:8080 \
-  -e DB_URL="jdbc:postgresql://ids-postgres:5432/ids" \
-  -e DB_USERNAME="ids_user" \
-  -e DB_PASSWORD="ids_password" \
-  -e JWT_SECRET="ah0yw/DmsqCTQk+EtjlBiix9uMQBg/7IGwGmFjJG9XQ=" \
-  ids:latest
+---
 
+## Quick Start
 
+```bash
+export JWT_SECRET="your_generated_secret_here"
+./mvnw clean package
+docker compose up --build -d
 
-  vUBeO3iwvYLyf+XWD6f2zQfsnmTQO6BWhoX6GRXwY=
-sU
-  sudo docker run --name ids-app \
-  --network ids-network \
-  -p 8080:8080 \
-  -e DB_URL="jdbc:postgresql://ids-postgres:5432/ids" \
-  -e DB_USERNAME="ids_user" \
-  -e DB_PASSWORD="ids_password" \
-  -e JWT_SECRET="lip+Cj4c6tHP7GuCwBo+v0UJL4PG9SDdHztKltUuVLQ="= \
-  ids:latest
+curl -X POST http://localhost:8080/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"firstName":"John","lastName":"Doe","email":"john@example.com","password":"password123"}'
 
-  aW5ZukreXWO9NPPjDZJZFNdjuCXTEysHGtuiHwK/IIo=
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"john@example.com","password":"password123"}'
+```
+
+Then test brute-force detection by repeating the failed login request five times.
+
+---
+
+## Useful References
+
+- Spring Boot: https://spring.io/projects/spring-boot
+- Spring Security: https://spring.io/projects/spring-security
+- PostgreSQL: https://www.postgresql.org/
+- Docker Compose: https://docs.docker.com/compose/
