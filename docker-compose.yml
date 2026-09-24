@@ -38,7 +38,7 @@ services:
     environment:
       DB_USERNAME: ids_app
       DB_PASSWORD: ids_password
-      DB_URL: jdbc:postgresql://postgres:5432/idsdb
+      DB_URL: "jdbc:postgresql://postgres:5432/idsdb"
       JWT_SECRET: ${JWT_SECRET}
 
     networks:
