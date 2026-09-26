@@ -24,6 +24,7 @@ public class SecurityConfig {
 
                  .requestMatchers(
                 "/",
+                "/index.html",
                 "/api/auth/login",
                 "/h2-console/**"
                 ).permitAll()

@@ -131,6 +131,95 @@ java -jar target/ids-0.0.1-SNAPSHOT.jar
 
 ---
 
+## Verify a Render Deployment
+
+Replace the URL below with the public URL of the Web Service shown in Render:
+
+```bash
+export RENDER_URL="https://intrusion-detection-and-security-9pr8.onrender.com"
+
+
+export RENDER_URL= "https://intrusion-detection-and-security-9pr8.onrender.com"
+```
+
+### Check that the service is running
+
+The root endpoint and health endpoint should both return a successful response:
+
+```bash
+curl -fsS "$RENDER_URL/"
+echo
+curl -fsS "$RENDER_URL/health"
+echo
+```
+
+To also verify the deployed API and database-backed user flow, create a test user and log in:
+
+```bash
+TEST_EMAIL="render-test-$(date +%s)@example.com"
+
+curl -fsS -X POST "$RENDER_URL/api/users" \
+  -H "Content-Type: application/json" \
+  -d "{\"firstName\":\"Ndumiso\",\"lastName\":\"Khathi\",\"email\":\"Mzwa12@gmail.com\",\"password\":\"TestPassword123\"}"
+echo
+
+curl -fsS -X POST "$RENDER_URL/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d "{\"email\":\"$Mzwa12@gmail.com\",\"password\":\"TestPassword13\"}"
+echo
+```
+
+Run the full IDS test script against Render from the repository root:
+
+```bash
+bash bin/test_ids_system.sh "$RENDER_URL"
+```
+
+The script uses test data and may create users, login events, and alerts in the deployed database. Run it only against a test deployment or an environment where this data is acceptable.
+
+### Check the Render PostgreSQL database
+
+In the Render dashboard, open the deployed service and use **Shell**, or connect from a machine that has network access to the database. Set `DATABASE_URL` to the Render PostgreSQL connection string if Render has not already provided it in the shell:
+
+```bash
+export DATABASE_URL="postgresql://ids_app:6i28hiRnyUWDiU9fYafjc3aYaMfEpSvQ@dpg-daq6atgjo6nc73d93cvg-a.singapore-postgres.render.com/idsdb_km97"
+```
+
+Test the database connection:
+
+```bash
+psql "$DATABASE_URL" -c "SELECT 1 AS database_connection;"
+```
+
+Confirm that the application tables exist and that the deployment test created data:
+
+```bash
+psql "$DATABASE_URL" -c "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name;"
+psql "$DATABASE_URL" -c "SELECT COUNT(*) AS users FROM users;"
+psql "$DATABASE_URL" -c "SELECT COUNT(*) AS security_events FROM security_events;"
+psql "$DATABASE_URL" -c "SELECT COUNT(*) AS security_alerts FROM security_alerts;"
+```
+
+Check recent records produced by the application:
+
+```bash
+
+
+psql "$DATABASE_URL" -c "SELECT * FROM security_events ORDER BY timestamp DESC LIMIT 10;"
+psql "$DATABASE_URL" -c "SELECT * FROM security_alerts ORDER BY timestamp DESC LIMIT 10;"
+```
+
+If Render provides the connection string as `DATABASE_URL`, the Spring Boot service must still receive its JDBC equivalent in `DB_URL`, for example:
+
+```text
+DB_URL=jdbc:postgresql://HOST:PORT/DATABASE
+DB_USERNAME=USER
+DB_PASSWORD=PASSWORD
+JWT_SECRET=<a-long-random-secret>
+```
+
+---
+
 ## API Endpoints
 
 ### User endpoints
@@ -138,7 +227,7 @@ java -jar target/ids-0.0.1-SNAPSHOT.jar
 #### Create a user
 
 ```bash
-curl -X POST http://localhost:8080/api/users \
+curl -fsS -X POST "$RENDER_URL/api/users"\
   -H "Content-Type: application/json" \
   -d '{
     "firstName":"John",
@@ -166,7 +255,7 @@ curl -i http://localhost:8080/api/users \
 #### Login
 
 ```bash
-curl -X POST http://localhost:8080/api/auth/login \
+curl -fsS -X POST "$RENDER_URL/api/auth/login" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "john@example.com",
