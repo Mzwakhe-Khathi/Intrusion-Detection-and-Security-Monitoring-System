@@ -26,6 +26,7 @@
 /home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/security/JwtAuthenticationFilter.java
 /home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/security/JwtService.java
 /home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/service/AuthService.java
+/home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/service/BruteForceLockoutService.java
 /home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/service/DetectionRuleService.java
 /home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/service/DetectionService.java
 /home/ndumiso/Mzwa/Intrusion-Detection-and-Security-Monitoring-System/src/main/java/com/cloud/ids/service/SecurityAlertService.java

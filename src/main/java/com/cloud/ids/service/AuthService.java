@@ -19,17 +19,20 @@ public class AuthService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final SecurityEventService securityEventService;
+        private final BruteForceLockoutService lockoutService;
 
     public AuthService(
             UserRepository repository,
             BCryptPasswordEncoder passwordEncoder,
             JwtService jwtService,
-            SecurityEventService securityEventService) {
+            SecurityEventService securityEventService,
+            BruteForceLockoutService lockoutService) {
 
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.securityEventService = securityEventService;
+        this.lockoutService = lockoutService;
     }
 
     public LoginResponse login(
@@ -38,6 +41,10 @@ public class AuthService {
 
         String clientIp = httpRequest.getRemoteAddr();
         LocalDateTime now = LocalDateTime.now();
+
+                if (lockoutService.isLocked(clientIp)) {
+                        throw new RuntimeException("Too many failed login attempts. This IP is locked for 2 minutes.");
+                }
 
         User user = repository.findByEmail(request.getEmail())
                 .orElseThrow(() -> {

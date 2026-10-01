@@ -17,14 +17,17 @@ public class DetectionService {
     private final DetectionRuleRepository ruleRepository;
     private final SecurityAlertRepository alertRepository;
     private final SecurityEventRepository eventRepository;
+    private final BruteForceLockoutService lockoutService;
 
     public DetectionService(
             DetectionRuleRepository ruleRepository,
             SecurityAlertRepository alertRepository,
-            SecurityEventRepository eventRepository) {
+            SecurityEventRepository eventRepository,
+            BruteForceLockoutService lockoutService) {
         this.ruleRepository = ruleRepository;
         this.alertRepository = alertRepository;
         this.eventRepository = eventRepository;
+        this.lockoutService = lockoutService;
     }
 
     /**
@@ -86,6 +89,8 @@ public class DetectionService {
         
         // If threshold is met
         if (failureCount >= rule.getThreshold()) {
+            lockoutService.lockout(event.getSourceIp());
+
             // Check if an open alert already exists to prevent duplicates
             var existingAlert = alertRepository.findOpenAlertByTypeAndIp(
                     "BRUTE_FORCE",
