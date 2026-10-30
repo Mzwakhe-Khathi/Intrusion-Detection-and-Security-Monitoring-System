@@ -1,5 +1,6 @@
 
 WTC-6NVNLKRN
+WTC-VDDV7JCX
 # Intrusion Detection & Security Monitoring System
 
 ## Overview
@@ -184,9 +185,9 @@ The script uses test data and may create users, login events, and alerts in the 
 In the Render dashboard, open the deployed service and use **Shell**, or connect from a machine that has network access to the database. Set `DATABASE_URL` to the Render PostgreSQL connection string if Render has not already provided it in the shell:
 
 ```bash
-export DATABASE_URL="postgresql://ids_app:6i28hiRnyUWDiU9fYafjc3aYaMfEpSvQ@dpg-daq6atgjo6nc73d93cvg-a.singapore-postgres.render.com/idsdb_km97"
+export DATABASE_URL="postgresql://neondb_owner:npg_VRPa9kQ5nFpB@ep-small-scene-az6fxwoa-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 ```
-
+postgresql://@ep-small-scene-az6fxwoa-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
 Test the database connection:
 
 ```bash
